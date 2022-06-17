@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+<head>
+	<meta charset="EUC-KR">
+	<title>Insert title here</title>
+</head>
+
+<body>
+	<div id="checkbox_Gr">
+		고정 확장자
+		<label><input type="checkbox" name="bat" value="bat" onClick="checkBoxChange(this)" unchecked>bat</label>
+		<label><input type="checkbox" name="cmd" value="cmd" onClick="checkBoxChange(this)" unchecked>cmd</label>
+		<label><input type="checkbox" name="com" value="com" onClick="checkBoxChange(this)" unchecked>com</label>
+		<label><input type="checkbox" name="cpl" value="cpl" onClick="checkBoxChange(this)" unchecked>cpl</label>
+		<label><input type="checkbox" name="exe" value="exe" onClick="checkBoxChange(this)" unchecked>exe</label>
+		<label><input type="checkbox" name="scr" value="scr" onClick="checkBoxChange(this)" unchecked>scr</label>
+		<label><input type="checkbox" name="js" value="js" onClick="checkBoxChange(this)" unchecked>js</label>
+	</div>
+	<br>
+	<div>
+		커스텀 확장자
+		<input type="text" id="extension" name="extension" placeholder="확장자 입력" maxlength="20">
+		<input type="button" id="submit" name="submit" value="+추가" onclick="createDIV()">
+	</div>
+	<div>
+		<br>
+		<form id="history" rows="8" cols="45"></form>
+	</div>
+	<div id="tag-count"></div>
+	<ul id="tag-list"></ul>
+
+	</div>
+
+	<script>
+
+		/* 확장자 View 보관용 전역 변수 tag 선언 */
+		var tag = {};
+
+		/* 동적 tag 생성 함수 - step1 */
+		function createDIV() {
+
+			var text = $('#extension').val();
+
+			/* text의 길이가 20이 넘을 경우 fail */
+			if (text.length > 20) {
+				alert('확장자 길이 초과');
+				$('#extension').val('');
+			} else if (text !== "") {
+				hashTag(text);
+			}
+		}
+
+		/* 태그 생성 - step2 */
+		function hashTag(value) { 
+
+			/* 신규 value와 idx를 tag 객체에 할당 */
+			function addTag(value, idx) {
+				tag[idx] = value; 
+			}
+
+			var self = $(this);
+			var tagValue = value;
+
+			/* 동일 태그 유무 확인  */
+			var result = Object.values(tag).filter(function (word) {
+				return word === tagValue;
+			})
+
+			/* 화면 內 데이터 중복 여부 체크 */
+			if (result.length == 0) {
+
+				/* 저장될 태그의 idx는 tag변수에 저장된 max 키 값 + 1 로 할당한다. */
+				let idx = Math.max(...Object.keys(tag)) + 1;
+
+				/* 저장된 태그의 개수를 별도로 구한다 */
+				let count = Object.keys(tag).length;
+
+				/* hashtag는 input으로만 입력이 가능하므로 main_yn값을 N으로 생성 */
+				var postParam = { ext_id: tagValue, main_yn: 'N', check_yn: 'Y' };
+
+				/* server로 저장을 요청하고 성공할 경우 tag-count의 값을 변경한다. */
+				$.ajax({
+					url: "/update",
+					data: JSON.stringify(postParam),
+					method: "POST",
+					dataType: "json",
+					contentType: 'application/json',
+					success: function (data) {
+						$("#tag-list").append("<li class='tag-item'>" + tagValue + "<span class='del-btn' idx='" + idx + "'>x</span></li>");
+						addTag(tagValue, idx);
+						self.val("");
+						$('#tag-count').text(count+1+"/200")
+					},
+					error: function (request, status, error) {
+					}
+				}); 
+			} else {
+				alert("태그값이 중복됩니다.");
+			}
+
+			/* 삭제 버튼 호출 시 Index 값 확인 후 삭제 - id 서버로 전송 */
+			$(document).on("click", ".del-btn", function (e) {
+				
+				var index = $(this).attr("idx");
+				
+				if (index === undefined) {
+					return;
+				}else{
+					var ext_id = tag[index];
+					delete tag[index];
+					$(this).parent().remove();
+
+					var postParam = { ext_id: ext_id };
+
+					/* 삭제 ajax */
+					$.ajax({
+						url: "/delete",
+						data: JSON.stringify(postParam),
+						method: "POST",
+						dataType: "json",
+						contentType: 'application/json',
+						success: function (data) {
+							
+						},
+						error: function (request, status, error) {
+						}
+					});
+				}
+				/* 삭제가 완료된 후 tag-count의 값을 tag변수의 길이로 업데이트 */
+				$('#tag-count').text(Object.keys(tag).length+"/200")
+			});
+
+		}
+	</script>
+	<script>
+		/* 화면 진입 시 DB 데이터 최초 호출 함수 */
+		$(document).ready(function () {
+			$.ajax({
+				url: "/get",
+				data: {},
+				method: "GET",
+				dataType: "json",
+				contentType: 'application/json',
+				success: function (data) {
+					
+					idx = 0;
+					
+					/* 최초 load시 main_yn , check_yn 값을 참조하여 checked 및 hashtag를 생성 */
+					data.forEach(function (element) {
+						tag[idx] = element.ext_id;
+						if (element.main_yn !== 'Y') {
+							/* hash태그 생성 */
+							$("#tag-list").append("<li class='tag-item'>" + element.ext_id + "<span class='del-btn' idx='" + idx + "'>x</span></li>");
+						}else if(element.main_yn === 'Y' && element.check_yn === 'Y'){
+							/* checkbox 의 속성을 checked 로 변경한다. */
+							$('input:checkbox[name="'+element.ext_id+'"]').prop('checked',true);
+						}
+						idx++;
+					})
+					
+					$('#tag-count').text(idx +"/200");
+
+					/* hashtag 內 delete 이벤트 선언 */ 
+					$(document).on("click", ".del-btn", function (e) {
+
+						var index = $(this).attr("idx");
+						if (index === undefined) {
+							return;
+						}else{
+							var ext_id = tag[index];
+
+							// tag[index] = "";
+							delete tag[index];
+							$(this).parent().remove();
+
+							var postParam = { ext_id: ext_id };
+
+							/* 삭제 ajax */
+							$.ajax({
+								url: "/delete",
+								data: JSON.stringify(postParam),
+								method: "POST",
+								dataType: "json",
+								contentType: 'application/json',
+								success: function (data) {
+									
+								},
+								error: function (request, status, error) {
+								}
+							});
+						}
+						$('#tag-count').text(Object.keys(tag).length+"/200")
+					});
+				},
+				error: function (request, status, error) {
+				}
+			});
+		});
+
+		/* checkBox 상태가 변경될 때마다 DB를 업데이트 한다. */
+		function checkBoxChange(object) {
+			var ext_id = object.name;
+			var check_yn = object.checked;
+			var postParam = { ext_id: ext_id, main_yn: 'Y', check_yn: check_yn === true ? 'Y' : 'N' };
+
+			$.ajax({
+				url: "/update",
+				data: JSON.stringify(postParam),
+				method: "POST",
+				dataType: "json",
+				contentType: 'application/json',
+				success: function (data) {
+
+				},
+				error: function (request, status, error) {
+				}
+			});
+		}
+	</script>
+</body>
+<style>
+	input[type=text] {
+		border: none;
+		border-bottom: 2px solid red;
+	}
+ 
+	* {
+		margin: 0;
+		padding: 0; 
+		font-family: "Nanum Gothic";
+		font-size: small;
+	}
+
+	ul {
+		padding: 16px 0;
+	}
+
+	ul li {
+		display: inline-block;
+		margin: 0 5px;
+		font-size: 14px;
+		letter-spacing: -.5px;
+	}
+
+	form {
+		padding-top: 16px;
+	}
+
+	ul li.tag-item {
+		padding: 4px 8px;
+		background-color: #777;
+		color: #000;
+	}
+
+	.tag-item:hover {
+		background-color: #262626;
+		color: #fff;
+	}
+
+	.del-btn {
+		font-size: 12px;
+		font-weight: bold;
+		cursor: pointer;
+		margin-left: 8px;
+	}
+</style>
+
+</html>

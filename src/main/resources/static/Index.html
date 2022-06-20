@@ -3,13 +3,13 @@
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
 <head>
-	<meta charset="EUC-KR">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Insert title here</title>
 </head>
 
 <body>
 	<div id="checkbox_Gr">
-		°íÁ¤ È®ÀåÀÚ
+		ê³ ì • í™•ì¥ì
 		<label><input type="checkbox" name="bat" value="bat" onClick="checkBoxChange(this)" unchecked>bat</label>
 		<label><input type="checkbox" name="cmd" value="cmd" onClick="checkBoxChange(this)" unchecked>cmd</label>
 		<label><input type="checkbox" name="com" value="com" onClick="checkBoxChange(this)" unchecked>com</label>
@@ -20,9 +20,9 @@
 	</div>
 	<br>
 	<div>
-		Ä¿½ºÅÒ È®ÀåÀÚ
-		<input type="text" id="extension" name="extension" placeholder="È®ÀåÀÚ ÀÔ·Â" maxlength="20">
-		<input type="button" id="submit" name="submit" value="+Ãß°¡" onclick="createDIV()">
+		ì»¤ìŠ¤í…€ í™•ì¥ì
+		<input type="text" id="extension" name="extension" placeholder="í™•ì¥ì ì…ë ¥" maxlength="20">
+		<input type="button" id="submit" name="submit" value="+ì¶”ê°€" onclick="createDIV()">
 	</div>
 	<div>
 		<br>
@@ -35,27 +35,27 @@
 
 	<script>
 
-		/* È®ÀåÀÚ View º¸°ü¿ë Àü¿ª º¯¼ö tag ¼±¾ğ */
+		/* í™•ì¥ì View ë³´ê´€ìš© ì „ì—­ ë³€ìˆ˜ tag ì„ ì–¸ */
 		var tag = {};
 
-		/* µ¿Àû tag »ı¼º ÇÔ¼ö - step1 */
+		/* ë™ì  tag ìƒì„± í•¨ìˆ˜ - step1 */
 		function createDIV() {
 
 			var text = $('#extension').val();
 
-			/* textÀÇ ±æÀÌ°¡ 20ÀÌ ³ÑÀ» °æ¿ì fail */
+			/* textì˜ ê¸¸ì´ê°€ 20ì´ ë„˜ì„ ê²½ìš° fail */
 			if (text.length > 20) {
-				alert('È®ÀåÀÚ ±æÀÌ ÃÊ°ú');
+				alert('í™•ì¥ì ê¸¸ì´ ì´ˆê³¼');
 				$('#extension').val('');
 			} else if (text !== "") {
 				hashTag(text);
 			}
 		}
 
-		/* ÅÂ±× »ı¼º - step2 */
+		/* íƒœê·¸ ìƒì„± - step2 */
 		function hashTag(value) { 
 
-			/* ½Å±Ô value¿Í idx¸¦ tag °´Ã¼¿¡ ÇÒ´ç */
+			/* ì‹ ê·œ valueì™€ idxë¥¼ tag ê°ì²´ì— í• ë‹¹ */
 			function addTag(value, idx) {
 				tag[idx] = value; 
 			}
@@ -63,24 +63,24 @@
 			var self = $(this);
 			var tagValue = value;
 
-			/* µ¿ÀÏ ÅÂ±× À¯¹« È®ÀÎ  */
+			/* ë™ì¼ íƒœê·¸ ìœ ë¬´ í™•ì¸  */
 			var result = Object.values(tag).filter(function (word) {
 				return word === tagValue;
 			})
 
-			/* È­¸é Ò® µ¥ÀÌÅÍ Áßº¹ ¿©ºÎ Ã¼Å© */
+			/* í™”ë©´ å…§ ë°ì´í„° ì¤‘ë³µ ì—¬ë¶€ ì²´í¬ */
 			if (result.length == 0) {
 
-				/* ÀúÀåµÉ ÅÂ±×ÀÇ idx´Â tagº¯¼ö¿¡ ÀúÀåµÈ max Å° °ª + 1 ·Î ÇÒ´çÇÑ´Ù. */
+				/* ì €ì¥ë  íƒœê·¸ì˜ idxëŠ” tagë³€ìˆ˜ì— ì €ì¥ëœ max í‚¤ ê°’ + 1 ë¡œ í• ë‹¹í•œë‹¤. */
 				let idx = Math.max(...Object.keys(tag)) + 1;
 
-				/* ÀúÀåµÈ ÅÂ±×ÀÇ °³¼ö¸¦ º°µµ·Î ±¸ÇÑ´Ù */
+				/* ì €ì¥ëœ íƒœê·¸ì˜ ê°œìˆ˜ë¥¼ ë³„ë„ë¡œ êµ¬í•œë‹¤ */
 				let count = Object.keys(tag).length;
 
-				/* hashtag´Â inputÀ¸·Î¸¸ ÀÔ·ÂÀÌ °¡´ÉÇÏ¹Ç·Î main_yn°ªÀ» NÀ¸·Î »ı¼º */
+				/* hashtagëŠ” inputìœ¼ë¡œë§Œ ì…ë ¥ì´ ê°€ëŠ¥í•˜ë¯€ë¡œ main_ynê°’ì„ Nìœ¼ë¡œ ìƒì„± */
 				var postParam = { ext_id: tagValue, main_yn: 'N', check_yn: 'Y' };
 
-				/* server·Î ÀúÀåÀ» ¿äÃ»ÇÏ°í ¼º°øÇÒ °æ¿ì tag-countÀÇ °ªÀ» º¯°æÇÑ´Ù. */
+				/* serverë¡œ ì €ì¥ì„ ìš”ì²­í•˜ê³  ì„±ê³µí•  ê²½ìš° tag-countì˜ ê°’ì„ ë³€ê²½í•œë‹¤. */
 				$.ajax({
 					url: "/update",
 					data: JSON.stringify(postParam),
@@ -97,10 +97,10 @@
 					}
 				}); 
 			} else {
-				alert("ÅÂ±×°ªÀÌ Áßº¹µË´Ï´Ù.");
+				alert("íƒœê·¸ê°’ì´ ì¤‘ë³µë©ë‹ˆë‹¤.");
 			}
 
-			/* »èÁ¦ ¹öÆ° È£Ãâ ½Ã Index °ª È®ÀÎ ÈÄ »èÁ¦ - id ¼­¹ö·Î Àü¼Û */
+			/* ì‚­ì œ ë²„íŠ¼ í˜¸ì¶œ ì‹œ Index ê°’ í™•ì¸ í›„ ì‚­ì œ - id ì„œë²„ë¡œ ì „ì†¡ */
 			$(document).on("click", ".del-btn", function (e) {
 				
 				var index = $(this).attr("idx");
@@ -114,7 +114,7 @@
 
 					var postParam = { ext_id: ext_id };
 
-					/* »èÁ¦ ajax */
+					/* ì‚­ì œ ajax */
 					$.ajax({
 						url: "/delete",
 						data: JSON.stringify(postParam),
@@ -128,14 +128,14 @@
 						}
 					});
 				}
-				/* »èÁ¦°¡ ¿Ï·áµÈ ÈÄ tag-countÀÇ °ªÀ» tagº¯¼öÀÇ ±æÀÌ·Î ¾÷µ¥ÀÌÆ® */
+				/* ì‚­ì œê°€ ì™„ë£Œëœ í›„ tag-countì˜ ê°’ì„ tagë³€ìˆ˜ì˜ ê¸¸ì´ë¡œ ì—…ë°ì´íŠ¸ */
 				$('#tag-count').text(Object.keys(tag).length+"/200")
 			});
 
 		}
 	</script>
 	<script>
-		/* È­¸é ÁøÀÔ ½Ã DB µ¥ÀÌÅÍ ÃÖÃÊ È£Ãâ ÇÔ¼ö */
+		/* í™”ë©´ ì§„ì… ì‹œ DB ë°ì´í„° ìµœì´ˆ í˜¸ì¶œ í•¨ìˆ˜ */
 		$(document).ready(function () {
 			$.ajax({
 				url: "/get",
@@ -147,14 +147,14 @@
 					
 					idx = 0;
 					
-					/* ÃÖÃÊ load½Ã main_yn , check_yn °ªÀ» ÂüÁ¶ÇÏ¿© checked ¹× hashtag¸¦ »ı¼º */
+					/* ìµœì´ˆ loadì‹œ main_yn , check_yn ê°’ì„ ì°¸ì¡°í•˜ì—¬ checked ë° hashtagë¥¼ ìƒì„± */
 					data.forEach(function (element) {
 						tag[idx] = element.ext_id;
 						if (element.main_yn !== 'Y') {
-							/* hashÅÂ±× »ı¼º */
+							/* hashíƒœê·¸ ìƒì„± */
 							$("#tag-list").append("<li class='tag-item'>" + element.ext_id + "<span class='del-btn' idx='" + idx + "'>x</span></li>");
 						}else if(element.main_yn === 'Y' && element.check_yn === 'Y'){
-							/* checkbox ÀÇ ¼Ó¼ºÀ» checked ·Î º¯°æÇÑ´Ù. */
+							/* checkbox ì˜ ì†ì„±ì„ checked ë¡œ ë³€ê²½í•œë‹¤. */
 							$('input:checkbox[name="'+element.ext_id+'"]').prop('checked',true);
 						}
 						idx++;
@@ -162,7 +162,7 @@
 					
 					$('#tag-count').text(idx +"/200");
 
-					/* hashtag Ò® delete ÀÌº¥Æ® ¼±¾ğ */ 
+					/* hashtag å…§ delete ì´ë²¤íŠ¸ ì„ ì–¸ */ 
 					$(document).on("click", ".del-btn", function (e) {
 
 						var index = $(this).attr("idx");
@@ -177,7 +177,7 @@
 
 							var postParam = { ext_id: ext_id };
 
-							/* »èÁ¦ ajax */
+							/* ì‚­ì œ ajax */
 							$.ajax({
 								url: "/delete",
 								data: JSON.stringify(postParam),
@@ -199,7 +199,7 @@
 			});
 		});
 
-		/* checkBox »óÅÂ°¡ º¯°æµÉ ¶§¸¶´Ù DB¸¦ ¾÷µ¥ÀÌÆ® ÇÑ´Ù. */
+		/* checkBox ìƒíƒœê°€ ë³€ê²½ë  ë•Œë§ˆë‹¤ DBë¥¼ ì—…ë°ì´íŠ¸ í•œë‹¤. */
 		function checkBoxChange(object) {
 			var ext_id = object.name;
 			var check_yn = object.checked;

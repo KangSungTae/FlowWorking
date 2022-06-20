@@ -36,14 +36,9 @@ public class FlowService {
 		
 		/* 저장된 확장자 수가 200이 넘는다면 fail로 리턴 */
 		int maximum = repo.findAll().size();
+
 		
-		/* 중복 있을 경우 */
-		if(checkExtensionDuplication(data)) {
-			response = ResponseEntity.builder()
-					.resCd(ResponseEntity.ResponseCode.DUPLICATE)
-					.resMesg(ResponseEntity.ResponseMesg.DUPLICATE)
-					.build();
-		}else if(maximum > 200) {
+		if(maximum > 200) {
 			response = ResponseEntity.builder()
 						.resCd(ResponseEntity.ResponseCode.FAIL_REASON1)
 						.resMesg(ResponseEntity.ResponseMesg.FAIL_REASON1)
@@ -58,11 +53,17 @@ public class FlowService {
 				ext = option.isPresent()?option.get() : ext;
 				/* 업데이트 일자를 최신화 */
 				ext.setUpt_dtm(date);
-			}else { 
+			}else if(!data.getMain_yn().equals("Y")){ 
 			/*  Main확장자가 아닐 경우 등록일자와 Main 여부 값 세팅 후 저장 */
 				ext.setReg_dtm(date);
 				ext.setMain_yn("N");
+			}else if(checkExtensionDuplication(data)) {
+				return ResponseEntity.builder()
+						.resCd(ResponseEntity.ResponseCode.DUPLICATE)
+						.resMesg(ResponseEntity.ResponseMesg.DUPLICATE)
+						.build();
 			}
+			
 			ext.setExt_id(data.getExt_id());
 			ext.setCheck_yn(data.getCheck_yn());
 			

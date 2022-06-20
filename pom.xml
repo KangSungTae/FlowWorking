@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>com.church</groupId>
 	<artifactId>Flow</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>FlowApp_0.1</version>
 	<name>Flow</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
